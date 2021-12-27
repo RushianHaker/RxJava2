@@ -25,8 +25,8 @@ public class PublisherService {
     /**
      * send порождает строку, и завершает свою работу.
      */
-    public List<News> send(String word) {
-         Observable.just(word).subscribe(x -> System.out.println(repo.getNews()));
+    public List<News> send(int id) {
+        Observable.just(id).map(s -> repo.getNews().size()).subscribe(s -> System.out.println("Size of list - " + s));
         return repo.getNews();
     }
 }

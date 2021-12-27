@@ -28,11 +28,11 @@ public class NewsController {
 
     /**
      * отправляем уведомление о новой статье на сайте
-     * @param entity новость
+     * @param id id новости
      */
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public List<News> getNews(@RequestParam String entity) {
-        log.trace("[POST] getNews({})", entity);
-        return publService.send(entity);
+    public List<News> getNews(@RequestParam int id) {
+        log.trace("[POST] getNews({})", id);
+        return publService.send(id);
     }
 }
