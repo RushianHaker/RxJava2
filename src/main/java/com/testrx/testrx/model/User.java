@@ -3,6 +3,7 @@ package com.testrx.testrx.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Класс User
@@ -11,6 +12,7 @@ import lombok.Data;
  * created 27.12.2021
  */
 @Data
+@RequiredArgsConstructor
 @AllArgsConstructor
 public class User {
     /**
@@ -22,12 +24,12 @@ public class User {
      * Имя
      */
     @JsonProperty("name")
-    private String name;
+    private final String name;
     /**
      * Любимые новости
      */
     @JsonProperty("favoritesNews")
-    private String favoritesNews;
+    private final String favoritesNews;
 
     /**
      * Возвращает строковое представление объекта в формате JSON
@@ -36,6 +38,6 @@ public class User {
      */
     @Override
     public String toString() {
-        return "News{" + "id=" + id +", name=" + name + ", favoritesNews=" + favoritesNews + '}';
+        return "User{" + "id=" + id +", name=" + name + ", favoritesNews=" + favoritesNews + '}';
     }
 }

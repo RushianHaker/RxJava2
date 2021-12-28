@@ -62,7 +62,7 @@ public class NewsRepository {
      *
      * @return запрашиваемая запись
      */
-    public List<News> getNews() {
+    public List<News> getNewsList() {
             return template.query(SQL_SELECT_LIST, NEWS_MAPPER);
     }
 
@@ -72,7 +72,7 @@ public class NewsRepository {
      * @param entity новая запись
      */
     public void insert(News entity) {
-            var result = template.update(SQL_INSERT, entity.getNewsNum(), entity.getId());
+            var result = template.update(SQL_INSERT, entity.getNewsNum(), entity.getName());
             if (result != 1) new SQLExceptionSubclassTranslator();
             log.trace("insert({}) result={}", entity, result);
     }

@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * created 27.12.2021
  */
 
-public class PublisherServiceTest {
+public class NewsPublServiceTest {
     String result="";
 
     // Simple subscription to a fix value

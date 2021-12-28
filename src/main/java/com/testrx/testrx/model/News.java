@@ -3,6 +3,7 @@ package com.testrx.testrx.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Класс News
@@ -11,6 +12,7 @@ import lombok.Data;
  * created 27.12.2021
  */
 @Data
+@RequiredArgsConstructor
 @AllArgsConstructor
 public class News {
     /**
@@ -22,12 +24,12 @@ public class News {
      * номер новости
      */
     @JsonProperty("newsNum")
-    private String newsNum;
+    private final String newsNum;
     /**
      * Имя новости
      */
     @JsonProperty("name")
-    private String name;
+    private final String name;
 
     /**
      * Возвращает строковое представление объекта в формате JSON
