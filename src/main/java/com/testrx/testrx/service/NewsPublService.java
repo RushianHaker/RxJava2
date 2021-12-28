@@ -2,10 +2,15 @@ package com.testrx.testrx.service;
 
 import com.testrx.testrx.model.News;
 import com.testrx.testrx.repository.NewsRepository;
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.functions.Consumer;
+import io.reactivex.subscribers.TestSubscriber;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Executable;
 import java.util.List;
 
 /**
@@ -19,16 +24,9 @@ import java.util.List;
 @Slf4j
 @AllArgsConstructor
 public class NewsPublService {
+
     private NewsRepository repo;
-
-    /**
-     * send порождает строку, и завершает свою работу.
-     */
-/*    public List<News> send(int id) {
-        Observable.just(id).map(s -> repo.getNews().size()).subscribe(s -> System.out.println("Size of list - " + s));
-        return repo.getNews();
-    }*/
-
+    private UserSuscrService subscriber;
 
     /**
      * Возвращает запись по идентификатору
@@ -36,8 +34,8 @@ public class NewsPublService {
      * @param id идентификатор записи
      * @return запрашиваемая запись
      */
-    public News getById(int id) {
-        return repo.getById(id);
+    public Single<News> getById(int id) {
+        return Single.just(repo.getById(id)).doOnSuccess(System.out::println);
     }
 
     /**
@@ -46,7 +44,14 @@ public class NewsPublService {
      * @return запрашиваемая запись
      */
     public List<News> getNewsList() {
+        Observable.create(subscriber -> subscriber.onComplete());
+
+        Observable.just(repo.getNewsList())
+                .map(s -> repo.getNewsList().size())
+                .doOnSubscribe(s -> System.out.println("Size of list - " + s));
+
         return repo.getNewsList();
+
     }
 
     /**
@@ -55,7 +60,8 @@ public class NewsPublService {
      * @param entity новая запись
      */
     public void insert(News entity) {
-        repo.insert(entity);
+        if (entity != null)
+            repo.insert(entity);
     }
 
     /**
@@ -64,22 +70,9 @@ public class NewsPublService {
      * @param entity обновляемая запись
      */
     public void update(News entity) {
-        var savedEntity = getById(entity.getId());
-        log.trace("update({})", savedEntity.getId());
-        repo.update(entity);
-        log.trace("update({}) done", entity);
+        if (entity != null)
+            repo.update(entity);
     }
 
-    /**
-     * Удаление записи
-     *
-     * @param entity удаляемая запись
-     */
-    public void delete(News entity) {
-        var savedEntity = getById(entity.getId());
-        log.trace("delete({})", savedEntity.getId());
-        repo.delete(entity);
-        log.trace("delete({}) done", savedEntity.getId());
-    }
 }
 

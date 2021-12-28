@@ -2,6 +2,7 @@ package com.testrx.testrx.controller;
 
 import com.testrx.testrx.model.News;
 import com.testrx.testrx.service.NewsPublService;
+import io.reactivex.Single;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class NewsController {
     private final NewsPublService newsService;
 
     @GetMapping(value = "/by_id")
-    public News getNews(@RequestParam("id") int id){
+    public Single<News> getNews(@RequestParam("id") int id){
         log.trace("[GET] getNews({})", id);
         return newsService.getById(id);
     }
@@ -55,15 +56,4 @@ public class NewsController {
         newsService.update(new News(id, name, newsNum));
         log.trace("[POST] updateNews({},{}, {}) updated", id, name, newsNum);
     }
-
-
-    /**
-     * отправляем уведомление о новой статье на сайте
-     * @param id id новости
-     */
-/*    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public List<News> getNews(@RequestParam int id) {
-        log.trace("[POST] getNews({})", id);
-        return publService.send(id);
-    }*/
 }

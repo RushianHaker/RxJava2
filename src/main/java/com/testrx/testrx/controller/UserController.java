@@ -2,6 +2,7 @@ package com.testrx.testrx.controller;
 
 import com.testrx.testrx.model.User;
 import com.testrx.testrx.service.UserSuscrService;
+import io.reactivex.Single;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * Класс UserCOntroller
+ * Класс UserController
  *
  * @author Max Ivanov
  * created 28.12.2021
@@ -23,7 +24,7 @@ public class UserController {
     private final UserSuscrService usrService;
 
     @GetMapping(value = "/by_id")
-    public User getUser(@RequestParam("id") int id){
+    public Single<User> getUser(@RequestParam("id") int id){
         log.trace("[GET] getUser({})", id);
         return usrService.getById(id);
     }
