@@ -1,2 +1,2 @@
-# RxJava2
-Test RxJava2 project
+# Vertx
+Test RxJava2 project with Vertx
