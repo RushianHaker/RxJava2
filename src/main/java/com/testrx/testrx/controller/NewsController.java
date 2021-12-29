@@ -2,6 +2,7 @@ package com.testrx.testrx.controller;
 
 import com.testrx.testrx.model.News;
 import com.testrx.testrx.service.NewsPublService;
+import io.reactivex.Completable;
 import io.reactivex.Single;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +32,7 @@ public class NewsController {
     }
 
     @GetMapping(value = "/list")
-    public List<News> getNewsList(){
+    public Completable getNewsList(){
         log.trace("[GET] getNewsList()");
         return  newsService.getNewsList();
     }

@@ -28,7 +28,7 @@ public class DbConfig extends DefaultDbConfig {
     @Bean
     @Qualifier("news")
     public DataSource demoDataSource(@Qualifier("news") SpringDataJdbcProperties properties) {
-        return hikariDataSource("news", properties);
+        return hikariDataSource(properties);
     }
 
     @Bean

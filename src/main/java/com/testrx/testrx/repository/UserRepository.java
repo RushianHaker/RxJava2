@@ -1,12 +1,13 @@
 package com.testrx.testrx.repository;
 
 import com.testrx.testrx.model.User;
+import io.reactivex.Single;
+import io.vertx.core.json.JsonArray;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.SQLExceptionSubclassTranslator;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
@@ -21,7 +22,7 @@ import java.util.List;
  */
 @Slf4j
 @Repository
-public class UserRepository {
+public class UserRepository extends SqlClient {
     private static final String SQL_SELECT_BY_ID = "" +
             "SELECT id, name, favoritesNews FROM user_news WHERE id = ?";
     private static final String SQL_SELECT_LIST = "" +
@@ -37,7 +38,6 @@ public class UserRepository {
 
     // beans
     protected final JdbcTemplate template;
-
 
     /**
      * Req-args constructor for Spring DI
@@ -62,8 +62,16 @@ public class UserRepository {
      *
      * @return запрашиваемая запись
      */
-    public List<User> getUserList() {
-            return template.query(SQL_SELECT_LIST, USER_MAPPER);
+    public Single<List<User>> getUserList() {
+        return execWithParams(SQL_SELECT_LIST, new JsonArray())
+                .map(resultSet -> resultSet.getRows()).toObservable().flatMapIterable(list -> list)
+                .map(json -> new User(
+                        json.getInteger("id"),
+                        json.getString("name"),
+                        json.getString("favoritesNews")
+                ))
+                .toList()
+                .doOnSuccess(list -> log.trace("Metadata created: [{}]", list));
     }
 
     /**
@@ -71,10 +79,11 @@ public class UserRepository {
      *
      * @param entity новая запись
      */
-    public void insert(User entity) {
-            var result = template.update(SQL_INSERT, entity.getFavoritesNews(), entity.getName());
-            if (result != 1) new SQLExceptionSubclassTranslator();
-            log.trace("insert({}) result={}", entity, result);
+    public Single<Integer> insert(User entity) {
+        return execWithParams(SQL_INSERT,
+                new JsonArray().add(entity.getId()).add(entity.getFavoritesNews()).add(entity.getName()))
+                .map(resultSet -> resultSet.getRows().get(0).getInteger("id"))
+                .doOnSuccess(id -> log.debug("Saved entity=[{}] with id=[{}]", entity, id));
     }
 
     /**
@@ -82,10 +91,11 @@ public class UserRepository {
      *
      * @param entity обновляемая запись
      */
-    public void update(User entity) {
-        var result = template.update(SQL_UPDATE, entity.getFavoritesNews(), entity.getName(), entity.getId());
-        if (result != 1) new SQLExceptionSubclassTranslator();
-        log.trace("update({}) result={}", entity, result);
+    public Single<Integer> update(User entity) {
+        return execWithParams(SQL_UPDATE,
+                new JsonArray().add(entity.getId()).add(entity.getFavoritesNews()).add(entity.getName()))
+                .map(resultSet -> resultSet.getRows().get(0).getInteger("id"))
+                .doOnSuccess(id -> log.debug("Saved entity=[{}] with id=[{}]", entity, id));
     }
 
     /**
@@ -93,11 +103,10 @@ public class UserRepository {
      *
      * @param entity удаляемая запись
      */
-    public void delete(User entity) {
-        // в параметры запроса идентификатор
-        var result = template.update(SQL_DELETE, entity.getId());
-        if (result != 1) new SQLExceptionSubclassTranslator();
-        log.trace("delete({}) result={}", entity, result);
+    public Single<Integer> delete(User entity) {
+        return execWithParams(SQL_DELETE,
+                new JsonArray().add(entity.getId())).map(resultSet -> resultSet.getRows().get(0).getInteger("id"))
+                .doOnSuccess(id -> log.debug("Saved entity=[{}] with id=[{}]", entity, id));
     }
 
     /**

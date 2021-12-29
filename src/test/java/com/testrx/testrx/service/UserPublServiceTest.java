@@ -6,13 +6,13 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Класс PublisherServiceTest
+ * Класс UserPublServiceTest
  *
  * @author Max Ivanov
  * created 27.12.2021
  */
 
-public class NewsPublServiceTest {
+public class UserPublServiceTest {
     String result="";
 
     @Test

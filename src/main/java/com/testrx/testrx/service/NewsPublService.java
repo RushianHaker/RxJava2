@@ -2,10 +2,12 @@ package com.testrx.testrx.service;
 
 import com.testrx.testrx.model.News;
 import com.testrx.testrx.repository.NewsRepository;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
 import io.reactivex.subscribers.TestSubscriber;
+import io.vertx.reactivex.ext.sql.SQLClient;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,11 +24,9 @@ import java.util.List;
 
 @Service
 @Slf4j
-@AllArgsConstructor
 public class NewsPublService {
 
     private NewsRepository repo;
-    private UserSuscrService subscriber;
 
     /**
      * Возвращает запись по идентификатору
@@ -43,15 +43,8 @@ public class NewsPublService {
      *
      * @return запрашиваемая запись
      */
-    public List<News> getNewsList() {
-        Observable.create(subscriber -> subscriber.onComplete());
-
-        Observable.just(repo.getNewsList())
-                .map(s -> repo.getNewsList().size())
-                .doOnSubscribe(s -> System.out.println("Size of list - " + s));
-
-        return repo.getNewsList();
-
+    public Completable getNewsList() {
+       return Completable.fromAction(() -> repo.getNewsList());
     }
 
     /**
@@ -59,9 +52,8 @@ public class NewsPublService {
      *
      * @param entity новая запись
      */
-    public void insert(News entity) {
-        if (entity != null)
-            repo.insert(entity);
+    public Completable insert(News entity) {
+        return Completable.fromAction(() -> repo.insert(entity));
     }
 
     /**
@@ -69,9 +61,8 @@ public class NewsPublService {
      *
      * @param entity обновляемая запись
      */
-    public void update(News entity) {
-        if (entity != null)
-            repo.update(entity);
+    public Completable update(News entity) {
+        return Completable.fromAction(() -> repo.update(entity));
     }
 
 }

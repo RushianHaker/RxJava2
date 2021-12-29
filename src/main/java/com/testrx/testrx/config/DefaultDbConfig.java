@@ -13,8 +13,8 @@ import javax.sql.DataSource;
 @Slf4j
 class DefaultDbConfig {
 
-    protected DataSource hikariDataSource(String tag, DbConfig.SpringDataJdbcProperties properties) {
-        log.info("[{}] настройки БД: [{}]", tag, properties.toString());
+    protected DataSource hikariDataSource(DbConfig.SpringDataJdbcProperties properties) {
+        log.info("[{}] настройки БД: [{}]", "news", properties.toString());
 
         HikariDataSource ds = new HikariDataSource();
         ds.setJdbcUrl(properties.getUrl());

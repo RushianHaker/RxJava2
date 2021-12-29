@@ -6,7 +6,6 @@ plugins {
 
 group = 'com.testrx'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
 
 configurations {
 	compileOnly {
@@ -19,19 +18,22 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.kafka:spring-kafka'
 	implementation group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.2.21'
+	implementation 'org.springframework.boot:spring-boot-starter-web:2.6.1'
 	implementation 'org.projectlombok:lombok:1.18.22'
-	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-	implementation 'org.springframework.data:spring-data-commons'
-	implementation 'org.postgresql:postgresql'
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc:2.6.1'
+	implementation 'org.springframework.data:spring-data-commons:2.6.0'
 
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.kafka:spring-kafka-test'
+	implementation 'org.postgresql:postgresql:42.3.1'
+	implementation 'com.h2database:h2:2.0.202'
+	implementation('io.vertx:vertx-jdbc-client:4.2.2')
+	implementation('io.vertx:vertx-sql-common:3.9.10')
+	implementation('io.vertx:vertx-rx-java2:4.2.2')
+	implementation('io.vertx:vertx-pg-client:4.2.3')
 
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test:2.6.1'
+	compileOnly 'org.projectlombok:lombok:1.18.22'
+	annotationProcessor 'org.projectlombok:lombok:1.18.22'
 }
 
 test {

@@ -2,6 +2,7 @@ package com.testrx.testrx.controller;
 
 import com.testrx.testrx.model.User;
 import com.testrx.testrx.service.UserSuscrService;
+import io.reactivex.Completable;
 import io.reactivex.Single;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/list")
-    public List<User> getUserList(){
+    public Completable getUserList(){
         log.trace("[GET] getUserList()");
         return  usrService.getUserList();
     }

@@ -1,12 +1,13 @@
 package com.testrx.testrx.repository;
 
 import com.testrx.testrx.model.News;
+import io.reactivex.Single;
+import io.vertx.core.json.JsonArray;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.SQLExceptionSubclassTranslator;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
@@ -21,7 +22,7 @@ import java.util.List;
  */
 @Slf4j
 @Repository
-public class NewsRepository {
+public class NewsRepository extends SqlClient {
     private static final String SQL_SELECT_BY_ID = "" +
             "SELECT id, newsnum, name FROM news WHERE id = ?";
     private static final String SQL_SELECT_LIST = "" +
@@ -53,8 +54,8 @@ public class NewsRepository {
      * @return запрашиваемая запись
      */
     public News getById(int id) {
-            return DataAccessUtils.singleResult(
-                    template.query(SQL_SELECT_BY_ID, NEWS_MAPPER, id));
+        return DataAccessUtils.singleResult(
+                template.query(SQL_SELECT_BY_ID, NEWS_MAPPER, id));
     }
 
     /**
@@ -62,8 +63,16 @@ public class NewsRepository {
      *
      * @return запрашиваемая запись
      */
-    public List<News> getNewsList() {
-            return template.query(SQL_SELECT_LIST, NEWS_MAPPER);
+    public Single<List<News>> getNewsList() {
+        return execWithParams(SQL_SELECT_LIST, new JsonArray())
+                .map(resultSet -> resultSet.getRows()).toObservable().flatMapIterable(list -> list)
+                .map(json -> new News(
+                        json.getInteger("id"),
+                        json.getString("name"),
+                        json.getString("newsnum")
+                ))
+                .toList()
+                .doOnSuccess(list -> log.trace("Metadata created: [{}]", list));
     }
 
     /**
@@ -71,10 +80,11 @@ public class NewsRepository {
      *
      * @param entity новая запись
      */
-    public void insert(News entity) {
-            var result = template.update(SQL_INSERT, entity.getNewsNum(), entity.getName());
-            if (result != 1) new SQLExceptionSubclassTranslator();
-            log.trace("insert({}) result={}", entity, result);
+    public Single<Integer> insert(News entity) {
+        return execWithParams(SQL_INSERT,
+                new JsonArray().add(entity.getId()).add(entity.getNewsNum()).add(entity.getName()))
+                .map(resultSet -> resultSet.getRows().get(0).getInteger("id"))
+                .doOnSuccess(id -> log.debug("Saved entity=[{}] with id=[{}]", entity, id));
     }
 
     /**
@@ -82,10 +92,11 @@ public class NewsRepository {
      *
      * @param entity обновляемая запись
      */
-    public void update(News entity) {
-        var result = template.update(SQL_UPDATE, entity.getNewsNum(), entity.getName(), entity.getId());
-        if (result != 1) new SQLExceptionSubclassTranslator();
-        log.trace("update({}) result={}", entity, result);
+    public Single<Integer> update(News entity) {
+        return execWithParams(SQL_UPDATE,
+                new JsonArray().add(entity.getId()).add(entity.getNewsNum()).add(entity.getName()))
+                .map(resultSet -> resultSet.getRows().get(0).getInteger("id"))
+                .doOnSuccess(id -> log.debug("Saved entity=[{}] with id=[{}]", entity, id));
     }
 
     /**
@@ -93,11 +104,10 @@ public class NewsRepository {
      *
      * @param entity удаляемая запись
      */
-    public void delete(News entity) {
-        // в параметры запроса идентификатор
-        var result = template.update(SQL_DELETE, entity.getId());
-        if (result != 1) new SQLExceptionSubclassTranslator();
-        log.trace("delete({}) result={}", entity, result);
+    public Single<Integer> delete(News entity) {
+        return execWithParams(SQL_DELETE,
+                new JsonArray().add(entity.getId())).map(resultSet -> resultSet.getRows().get(0).getInteger("id"))
+                .doOnSuccess(id -> log.debug("Saved entity=[{}] with id=[{}]", entity, id));
     }
 
     /**
